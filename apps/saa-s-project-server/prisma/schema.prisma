@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Organization {
+  address      String?
+  contactEmail String?
+  contactPhone String?
+  createdAt    DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String?
+  updatedAt    DateTime @updatedAt
+  users        User[]
+}
+
+model Plan {
+  createdAt     DateTime       @default(now())
+  description   String?
+  durationDays  Int?
+  id            String         @id @default(cuid())
+  numberOfUsers Int?
+  planName      String?
+  price         Float?
+  subscriptions Subscription[]
+  updatedAt     DateTime       @updatedAt
+}
+
+model Subscription {
+  createdAt DateTime  @default(now())
+  endDate   DateTime?
+  id        String    @id @default(cuid())
+  isActive  Boolean?
+  plan      Plan?     @relation(fields: [planId], references: [id])
+  planId    String?
+  startDate DateTime?
+  updatedAt DateTime  @updatedAt
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model User {
+  createdAt      DateTime       @default(now())
+  email          String?        @unique
+  firstName      String?
+  id             String         @id @default(cuid())
+  lastName       String?
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  organizationId String?
+  password       String
+  roles          Json
+  subscriptions  Subscription[]
+  updatedAt      DateTime       @updatedAt
+  username       String         @unique
+}
